@@ -3,7 +3,7 @@
 <html>
 
 	<head>
-		<title>Random Quote Generator (PD)</title>
+		<title>Weather App (PD)</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 		<link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -16,54 +16,170 @@
 
 		<script>
 
-			function getLocation() {
-					navigator.geolocation.getCurrentPosition(function(position) {
-					  console.log(position.coords.latitude, position.coords.longitude);
-					  $("#tempDiv").html('<p>TEMP</p>');
-					  $("#locationDiv").html('<p>LOCATION</p>');
-					  $("#conditionDiv").html('<p>CONDITION</p>');
-					  $("#windDiv").html('<p>WIND</p>');
-					  // could also do...
-					  // $("#location").text('LoCaTiOn');
-					});
+
+			// function getLatLon(){
+			// 	navigator.geolocation.getCurrentPosition(function(position) {
+			// 	  console.log(position.coords.latitude, position.coords.longitude);
+			// 		lat = position.coords.latitude;
+			// 		lon = position.coords.longitude;
+			// 	});
+			// }	
+			function round(value, precision) {
+			    var multiplier = Math.pow(10, precision || 0);
+			    return Math.round(value * multiplier) / multiplier;
+			}
+
+			function adjustNum(num){
+				var char;
+				if (num > 337.5 && num <= 360 || num <=22.5) {
+				    char = "N";
+				} else if (num >22.5 && num <=67.5){
+				    char = "NE";
+				} else if (num >67.5 && num <=112.5){
+				    char = "E";
+				} else if (num >112.5 && num <=157.5){
+				    char = "SE";
+				} else if (num >157.5 && num <=202.5){
+				    char = "S";
+				} else if (num >202.5 && num <=247.5){
+				    char = "SW";
+				} else if (num >247.5 && num <=292.5){
+				    char = "W";
+				} else if (num >292.5 && num <=337.5){
+				    char = "NW";
+				} else {
+				    char = "??";
 				}
+				return char;
+			}
+
+			function mood(text){
+				if (text == "clear-day"){
+					condition = 'Clear';
+					$("body").addClass("clear-day");
+				}
+				else if (text == "clear-night"){
+					condition = 'Clear';
+					$("body").addClass("clear-night");
+				}
+				else if (text == "rain"){
+					condition = 'Raining';
+					$("body").addClass("rain");
+				}
+				else if (text == "snow"){
+					condition = 'Snowing';
+					$("body").addClass("snow");
+				}
+				else if (text == "sleet"){
+					condition = 'Sleeting';
+					$("body").addClass("sleet");
+				}
+				else if (text == "wind"){
+					condition = 'Windy';
+					$("body").addClass("wind");
+				}
+				else if (text == "fog"){
+					condition = 'Foggy';
+					$("body").addClass("fog");
+				}
+				else if (text == "cloudy"){
+					condition = 'Cloudy';
+				  $("body").addClass("cloudy");
+				}
+				else if (text == "partly-cloudy-night"){
+					condition = 'Partly Cloudy';
+					$("body").addClass("partly-cloudy-night");
+				}
+				else if (text == "partly-cloudy-day"){
+					condition = 'Partly Cloudy';
+					$("body").addClass("partly-cloudy-day");
+				}
+				else {
+					condition = 'Check the Window'
+					$("body").addClass("unknown-weather");
+				}
+				return condition;
+			}
 
 			$(document).ready(function() {
-				// LOAD INITIAL QUOTE
-					getLocation();
+				// Load weather
+				  $.getJSON("http://ip-api.com/json/?callback=?", function(data) {
+						//Set lat and lon
+						var lat = data.lat;
+						var lon = data.lon;
+						var temp_f;
+						var temp_c;
+						var tempVisible;
+						var wind;
+						var darkSkyKey = "202313d5aa95df68d784c85dfcecddbd"
 
-				// LOAD SUBSEQUENT QUOTES ON CLICK
-				$('#getMessage').on('click', function() {
-			    fetchQuote();
-				});
+						// JQUERY to City, State
+					  $("#location").text(data.city + ', ' + data.region);		
 
+						//Get weather from darkSky
+						$.ajax({
+	            url : "https://api.darksky.net/forecast/" + darkSkyKey +"/"+lat+","+lon+"?exclude=minutely,hourly,daily,alerts,flags",
+	            dataType : "jsonp",
+	            success : function(parsed_json) {
+		            temp_f = parsed_json['currently']['temperature'];
+		            temp_c = (temp_f - 32) * (5/9);
+		            tempVisible = temp_f;
+		            // console.log('F ' +temp_f);
+		            // console.log('C ' +temp_c);
+		            // console.log('V ' +tempVisible);
+		            wind = parsed_json['currently']['windSpeed'];
+		            windDirection = adjustNum(parsed_json['currently']['windBearing']);
+		            icon = parsed_json['currently']['icon'];
+
+		            // Load up Weather Data
+		            $("#temp").html("<h2>"+round(tempVisible, 0) + " F</h2>");
+		            $("#wind").text(windDirection + ' ' +round(wind, 1) + ' knots')
+		            $("#condition").text(mood(icon));
+	            }
+          	});
+
+          	$('#tempDiv').on('click', function() {
+		    			if (tempVisible == temp_f){
+		    				tempVisible = temp_c;
+		    				$("#temp").html("<h2>"+round(temp_c, 0) + " C</h2>");
+
+		    			} else if (tempVisible == temp_c){
+		    				tempVisible = temp_f;
+		    				$("#temp").html("<h2>"+round(tempVisible, 0) + " F</h2>");
+		    			}
+						});
+
+
+	        });
+        		
 			});
+
 		</script>
 
 
-		<div id="main" class="container">
-			
-			<h1 style="font-family: 'Josefin Sans', sans-serif;">Weather App</h1>
-			
-			<div id="tempDiv">
-				<p>CLOUD|62F</p>
-			</div>
+		<div id="main" class="container">	
+			<h1 style="font-family: 'Josefin Sans', sans-serif;">Weather App</h1>		
 
 			<div id="weatherDiv">
 				<div class="row">
-					<div class="col col-md-4">
+					<div class="col col-md-3">
 						<div id="locationDiv"  class="col col-md-12">
-							<p id="location">Location</p>
+							<h2 id="location">Location</h2>
 						</div>
 					</div>
-					<div class="col col-md-4">
+					<div class="col col-md-3">
+						<div id="tempDiv"  class="col col-md-12">
+								<h2 id="temp">Tempurature</h2>
+						</div>
+					</div>
+					<div class="col col-md-3">
 						<div id="conditionDiv"  class="col col-md-12">
-							<p id="condition">Condition</p>
+							<h2 id="condition">Condition</h2>
 						</div>
 					</div>
-					<div class="col col-md-4">
+					<div class="col col-md-3">
 						<div id="windDiv"  class="col col-md-12">
-							<p>Wind</p>
+							<h2 id="wind">Wind</h2>
 						</div>
 					</div>
 				</div>
