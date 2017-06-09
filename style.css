@@ -1,0 +1,47 @@
+body{
+	/*Sunny Day*/
+	background: url("http://cdn.wallpapersafari.com/26/48/7ey9oi.jpg") no-repeat center center fixed; 
+	/*Cloudy Day*/
+	/*background: url("http://img13.deviantart.net/541a/i/2013/333/d/c/cloudy_day_by_nemecle-d6w21rp.jpg") no-repeat center center fixed; */
+	/*Snowy Day*/
+	/*background: url("http://themepack.me/i/c/749x468/media/g/402/snowy-day-theme-6.jpg") no-repeat center center fixed; */
+	/*Rainy Day*/
+	/*background: url("https://az616578.vo.msecnd.net/files/responsive/cover/main/desktop/2016/08/13/6360670335816709561877596775_635838328234606825-1082304514_rainy_day_wallpaper_2.jpeg") no-repeat center center fixed; */
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+p, h1, h2, h3, h4, h5, h6{
+	font-family: 'Josefin Sans', sans-serif;
+}
+
+#main{
+	margin-top: 15em;
+}
+
+h1 { text-align: center; }
+
+#tempDiv{
+	max-width: 40%;
+	margin: auto;
+	text-align: center;
+}
+
+#weatherDiv{
+	margin: auto;
+	text-align: center;
+	max-width: 40%;
+}
+
+#locationDiv, #conditionDiv, #windDiv{
+	padding: 15px;
+	background: rgba(256,256,256,.5);
+	border-radius: 5px;
+}
+
+
+#locationDiv p, #conditionDiv p, #windDiv p{
+	margin: 0px;
+}
